@@ -613,13 +613,16 @@ OtaPalStatus_t otaPal_CloseFile(OtaFileContext_t *const pFileContext)
         }
         else
         {
-             /* Create ota file. */
-            prvCreateOtaFile( pFileContext );
-
-            /* Apply the patch. */
-            if( 0 != prvApplyPatch( ) )
+            if( prvIsPatchFile( ( char * )pFileContext->pFilePath ) )
             {
-                 return OTA_PAL_COMBINE_ERR( OtaPalFileClose, 0 );
+                /* Create ota file. */
+                prvCreateOtaFile( pFileContext );
+
+                /* Apply the patch. */
+                if( 0 != prvApplyPatch( ) )
+                {
+                    return OTA_PAL_COMBINE_ERR( OtaPalFileClose, 2 );
+                }
             }
 
             /* Write ASN1 decoded signature at the end of firmware image for bootloader to validate during bootup */
